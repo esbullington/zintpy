@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # coding: utf8
+# Copyright Eric S. Bullington, 2011
+# Licensed under MIT and GPLv3
+# Python wrapper for libzint - the open source barcode library
+# http://sourceforge.net/projects/zint/
 
 from ctypes import *
 
