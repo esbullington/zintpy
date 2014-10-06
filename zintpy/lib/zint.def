@@ -1,0 +1,27 @@
+;------------------------------------------
+; LIBZINT module definition file for Windows
+;------------------------------------------
+
+LIBRARY
+
+EXPORTS
+;Version 2.4.3
+DllGetVersion
+
+ZBarcode_Create
+ZBarcode_Clear
+ZBarcode_Delete
+
+ZBarcode_Encode
+ZBarcode_Encode_File
+ZBarcode_Print
+ZBarcode_Encode_and_Print
+ZBarcode_Encode_File_and_Print
+
+ZBarcode_Render
+
+ZBarcode_Buffer
+ZBarcode_Encode_and_Buffer
+ZBarcode_Encode_File_and_Buffer
+
+ZBarcode_ValidID

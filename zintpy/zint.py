@@ -119,7 +119,7 @@ class Zint:
             fgcolour="000000",
             bgcolour="ffffff",
             outfile="out.png"):
-        self.zint = CDLL("/usr/local/lib/libzint.so")
+        self.zint = CDLL("./data/libzint.so")
         self.zint.ZBarcode_Create.restype = POINTER(ZintSymbol)
         self.symbol = self.zint.ZBarcode_Create()
         self.symbol.contents.symbology = symbology

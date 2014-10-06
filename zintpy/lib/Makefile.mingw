@@ -1,0 +1,97 @@
+# Linux makefile for libzint
+#
+# make			compiles with QR Code support
+# make install		copies to /usr/lib
+# make uninstall	removes library
+# make clean		cleans up a previous compilation and any object or editor files
+
+ZINT_VERSION:=-DZINT_VERSION=\"2.4.3.0\"
+
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURR_DIR := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
+
+NO_PNG=true
+
+PREFIX := x86_64-w64-mingw32
+CC:= x86_64-w64-mingw32-gcc
+AR:= x86_64-w64-mingw32-ar rc
+RANLIB:= x86_64-w64-mingw32-ranlib
+CFLAGS:= -O2 -fms-extensions -mms-bitfields -fno-exceptions -fomit-frame-pointer -Wall
+LDFLAGS = -Wl,--major-image-version=2 -Wl,--minor-image-version=43
+RC := $(PREFIX)-windres
+RCFLAGS:= --output-format=rc --target=pe-x86-64
+
+ROOT_DIR := /usr/x86_64-w64-mingw32
+includedir := $(ROOT_DIR)/include
+libdir := $(ROOT_DIR)/lib
+bindir := $(ROOT_DIR)/bin
+DESTDIR := $(CURR_DIR)
+APP:=zint
+DLL:=$(APP).dll
+DLLIMP:=lib$(DLL).a
+# STATLIB:=lib$(APP).a
+# TOOLLIB:=lib$(APP).la
+
+COMMON_OBJ:= common.o render.o png.o library.o ps.o large.o reedsol.o gs1.o svg.o
+ONEDIM_OBJ:= code.o code128.o 2of5.o upcean.o telepen.o medical.o plessey.o rss.o
+POSTAL_OBJ:= postal.o auspost.o imail.o
+TWODIM_OBJ:= code16k.o dmatrix.o pdf417.o qr.o maxicode.o composite.o aztec.o code49.o code1.o gridmtx.o
+
+LIB_OBJ:= $(COMMON_OBJ) $(ONEDIM_OBJ) $(TWODIM_OBJ) $(POSTAL_OBJ)
+DLL_OBJ:= $(LIB_OBJ:.o=.lo) dllversion.lo
+
+ifeq ($(NO_PNG),true)
+DEFINES+= -DNO_PNG
+else
+DEFINES_DLL+= -DPNG_DLL -DZLIB_DLL
+LIBS+= -lpng -lz
+endif
+
+LIBS+= -lm
+
+all: $(DLL)
+DLL: $(DLL)
+
+%.lo:%.c
+	@echo Compiling $< ...
+	$(CC) $(CFLAGS) $(DEFINES) $(DEFINES_DLL) -DDLL_EXPORT -DPIC $(ZINT_VERSION) -c -o $@ $<
+
+%.o:%.c
+	@echo Compiling $< ...
+	$(CC) $(CFLAGS) $(DEFINES) $(ZINT_VERSION) -c -o $@ $<
+
+libzint.rc: $(DLL_OBJ)
+	$(RC) $(RCFLAGS) $@
+	 
+libzint.o: libzint.rc
+	$(AR) -o $@ $<
+		 
+$(DLL):$(DLL_OBJ) libzint.o
+	@echo Linking $@...
+	$(CC) -shared -Wl,--out-implib,$(DLLIMP) $(LDFLAGS) -o $@ $(DLL_OBJ) libzint.o $(LIBS)
+
+$(STATLIB): $(LIB_OBJ)
+	@echo Linking $@...
+	$(RC) $@ $(LIB_OBJ)
+	-@ ($(RANLIB) $@ || true) >/dev/null 2>&1
+		
+.PHONY: install uninstall clean dist
+
+install:
+	cp -fp $(DLLIMP) $(DESTDIR)$(libdir)
+	cp -fp $(STATLIB) $(DESTDIR)$(libdir)
+	cp -fp $(TOOLLIB) $(DESTDIR)$(libdir)
+	cp -fp zint.h $(DESTDIR)$(includedir)/zint.h
+	cp -fp $(DLL) $(DESTDIR)$(bindir)
+
+uninstall:
+	rm $(DESTDIR)$(libdir)/$(DLLIMP)
+	rm $(DESTDIR)$(libdir)/$(STATLIB)
+	rm $(DESTDIR)$(libdir)/$(TOOLLIB)
+	rm $(DESTDIR)$(includedir)/zint.h
+	rm $(DESTDIR)$(bindir)/$(DLL)
+
+clean:
+	rm -f *.lib *.dll *.o *.a *.res *.exe *.lo *.bak
+
+
