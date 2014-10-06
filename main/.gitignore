@@ -1,1 +1,3 @@
 out.png
+*.pyc
+__pycache__/
