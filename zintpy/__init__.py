@@ -1,1 +1,1 @@
-import zint
+from zint import Zint
