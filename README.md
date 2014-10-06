@@ -1,6 +1,6 @@
 ##ZintPy
 
-ZintPy is a Python wrapper for the libzint barcode-encoding library, developed by Robin Stuart as part of the zint project.
+ZintPy is a Python wrapper for the libzint barcode-encoding library, developed by Robin Stuart as part of the [Zint Barcode Generator project](http://sourceforge.net/projects/zint/).
 
 Features
 ----
