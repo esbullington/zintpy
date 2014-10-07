@@ -56,7 +56,7 @@ setup(name='ZintPy',
             },
         entry_points={
             'console_scripts': [
-                'zint = zintpy.scripts.main'
+                'zint = zintpy.scripts:main'
                 ]
             },
         zip_safe=False)
