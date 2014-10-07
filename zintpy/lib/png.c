@@ -44,7 +44,7 @@
 #endif /* _MSC_VER */
 
 #ifndef NO_PNG
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include <png.h>        /* libpng header; includes zlib.h and setjmp.h */
 #endif /* NO_PNG */
 #include "maxipng.h"	/* Maxicode shapes */
 

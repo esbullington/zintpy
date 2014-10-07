@@ -10,7 +10,7 @@ ZINT_VERSION:=-DZINT_VERSION=\"2.4.3.0\"
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURR_DIR := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
-NO_PNG=true
+NO_PNG=false
 
 PREFIX := x86_64-w64-mingw32
 CC:= x86_64-w64-mingw32-gcc
@@ -29,6 +29,7 @@ DESTDIR := $(CURR_DIR)
 APP:=zint
 DLL:=$(APP).dll
 DLLIMP:=lib$(DLL).a
+INCLUDES += -I/usr/include/libpng12 -I/usr/include
 # STATLIB:=lib$(APP).a
 # TOOLLIB:=lib$(APP).la
 
@@ -44,36 +45,32 @@ ifeq ($(NO_PNG),true)
 DEFINES+= -DNO_PNG
 else
 DEFINES_DLL+= -DPNG_DLL -DZLIB_DLL
-LIBS+= -lpng -lz
+LIB_FLAGS+= -lpng -lz
 endif
 
-LIBS+= -lm
+LIB_FLAGS+= -lm
 
 all: $(DLL)
 DLL: $(DLL)
 
 %.lo:%.c
 	@echo Compiling $< ...
-	$(CC) $(CFLAGS) $(DEFINES) $(DEFINES_DLL) -DDLL_EXPORT -DPIC $(ZINT_VERSION) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEFINES_DLL) -DDLL_EXPORT -DPIC $(ZINT_VERSION) -c -o $@ $<
 
 %.o:%.c
 	@echo Compiling $< ...
-	$(CC) $(CFLAGS) $(DEFINES) $(ZINT_VERSION) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) $(ZINT_VERSION) -c -o $@ $<
 
-libzint.rc: $(DLL_OBJ)
-	$(RC) $(RCFLAGS) $@
+# libzint.rc: $(DLL_OBJ)
+# 	$(RC) $(RCFLAGS) $@
 	 
-libzint.o: libzint.rc
-	$(AR) -o $@ $<
+# libzint.o: $(DLL_OBJ)
+# 	$(AR) -o $@ $<
 		 
-$(DLL):$(DLL_OBJ) libzint.o
+$(DLL):$(DLL_OBJ)
 	@echo Linking $@...
-	$(CC) -shared -Wl,--out-implib,$(DLLIMP) $(LDFLAGS) -o $@ $(DLL_OBJ) libzint.o $(LIBS)
+	$(CC) -shared -Wl,--out-implib,$(DLLIMP) $(LDFLAGS) -o $@ $(DLL_OBJ) $(LIB_FLAGS)
 
-$(STATLIB): $(LIB_OBJ)
-	@echo Linking $@...
-	$(RC) $@ $(LIB_OBJ)
-	-@ ($(RANLIB) $@ || true) >/dev/null 2>&1
 		
 .PHONY: install uninstall clean dist
 
