@@ -1,4 +1,33 @@
-from setuptools import setup
+import shutil
+from setuptools import Command, setup
+
+class CleanCommand(Command):
+
+    """setuptools Clean"""
+    description = "Clean directory"
+    user_options = list(tuple())
+
+
+    def initialize_options(self):
+        
+        """init options"""
+        pass
+
+    def finalize_options(self):
+
+        """finalize options"""
+        pass
+
+    def remove_directory(self, top):
+        shutil.rmtree(top)
+
+    def run(self):
+        tops = ['./build', './dist', './ZintPy.egg-info']
+        for top in tops:
+            self.remove_directory(top)
+
+
+
 
 def readme():
     with open('README.md') as f:
@@ -22,4 +51,12 @@ setup(name='ZintPy',
         author_email='eric.s.bullington@gmail.com',
         license='BSD',
         packages=['zintpy'],
+        cmdclass={
+            'clean': CleanCommand,
+            },
+        entry_points={
+            'console_scripts': [
+                'zint = zintpy.scripts.main'
+                ]
+            },
         zip_safe=False)
