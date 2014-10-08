@@ -50,6 +50,7 @@ setup(name='ZintPy',
         author='Eric S. Bullington',
         author_email='eric.s.bullington@gmail.com',
         license='BSD',
+        install_requires=['six'],
         packages=['zintpy'],
         cmdclass={
             'clean': CleanCommand,
