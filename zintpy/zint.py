@@ -116,6 +116,7 @@ class Zint:
             whitespace_width=0,
             border_width=0,
             output_options=0,
+            show_hrt=1,
             fgcolour="000000",
             bgcolour="ffffff",
             outfile="out.png"):
@@ -124,6 +125,7 @@ class Zint:
         self.symbol = self.zint.ZBarcode_Create()
         self.symbol.contents.symbology = symbology
         self.symbol.contents.scale = scale
+        self.symbol.contents.show_hrt = show_hrt
         self.symbol.contents.whitespace_width = whitespace_width
         self.symbol.contents.border_width = border_width
         self.symbol.contents.output_options = output_options
